@@ -90,6 +90,43 @@ Server akan berjalan di: http://localhost:5000
 
 ---
 
+## 📫 API Endpoints
+
+### Auth
+
+prefix route: `/user`
+| Method | Endpoint | Deskripsi |
+| ------ | --------- | ------------------------- |
+| POST | /register | Register user |
+| POST | /login | Login user (JWT + cookie) |
+| POST | /logout | Logout (hapus cookie) |
+
+### Transaction
+
+prefix route: `/finance`
+
+| Method | Endpoint    | Deskripsi             |
+| ------ | ----------- | --------------------- |
+| POST   | /add        | Tambah transaksi      |
+| GET    | /all        | Ambil semua transaksi |
+| DELETE | /delete/:id | Hapus transaksi       |
+
+### Profile
+
+prefix route: `/user`
+| Method | Endpoint | Deskripsi |
+| ------ | -------- | ----------------------- |
+| GET | /profile | Ambil data profile user |
+
+### Summary
+
+prefix route: `/summary`
+| Method | Endpoint | Deskripsi |
+| ------ | -------- | ----------------------------------------------- |
+| GET | / | Ambil saldo, total pemasukan, total pengeluaran |
+
+---
+
 ## 🚀 Deployment
 
 ### Lokal (default)
