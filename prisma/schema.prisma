@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String    @id @default(uuid())
+  fullname             String    @db.VarChar(255)
+  email                String    @db.VarChar(255)
+  username             String    @db.VarChar(255)
+  password             String    @db.VarChar(255)
+  role                 RoleUser  @default(USER)
+  refresh_token_hash   String?
+  refresh_token_expiry DateTime? @db.Timestamptz(6)
+  created_at           DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @db.Timestamptz(6)
+
+  finance Finance[]
+}
+
+enum RoleUser {
+  USER
+  ADMIN
+}
+
+model Finance {
+  id               String      @id @default(uuid())
+  user_id          String
+  description      String      @db.VarChar(255)
+  amount           Int         @db.Integer
+  type             TypeFinance @default(income)
+  category         Category    @default(gaji)
+  transaction_date DateTime    @db.Timestamptz(6)
+  created_at       DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime    @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+enum TypeFinance {
+  income
+  expense
+}
+
+enum Category {
+  gaji
+  freelance
+  investasi
+  hadiah
+  makanan
+  transportasi
+  belanja
+  tagihan
+  hiburan
+  kesehatan
+  lainnya
+}
