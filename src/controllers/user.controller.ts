@@ -123,6 +123,7 @@ export const getProfile = async (req: Request, res: Response) => {
         id: true,
         fullname: true,
         username: true,
+        email: true,
         role: true,
       },
     });
@@ -198,7 +199,7 @@ export const logout = async (req: Request, res: Response) => {
 
 export const verfiyAuth = async (req: Request, res: Response) => {
   try {
-    const token = req.cookies?.session;
+    const token = req.cookies?.accessToken;
     if (!token) {
       return res.status(401).json({
         code: 'UNAUTHORIZED',
@@ -276,6 +277,70 @@ export const refreshToken = async (req: Request, res: Response) => {
       data: null,
     });
   } catch (error) {
+    return res.status(500).json({
+      code: 'INTERNAL_SERVER_ERROR',
+      messasge: 'Something went wrong',
+      data: null,
+    });
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { fullname, email, username, password } = req.body;
+  try {
+    const accessToken = req?.cookies?.accessToken;
+    if (!accessToken) {
+      return res.status(401).json({
+        code: 'UNAUTHORIZED',
+        messasge: 'Missing access token',
+        data: null,
+      });
+    }
+
+    const claims = verifyToken(accessToken);
+    if (!claims) {
+      return res.status(401).json({
+        code: 'UNAUTHORIZED',
+        messasge: 'Invalid token',
+        data: null,
+      });
+    }
+
+    const user = await prisma.user.findFirst({
+      where: { id: claims.id },
+      select: {
+        id: true,
+        fullname: true,
+        username: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        code: 'NOT_FOUND',
+        messasge: 'Account not found',
+        data: null,
+      });
+    }
+
+    const editData = await prisma.user.update({
+      where: { id: claims.id },
+      data: {
+        fullname: fullname,
+        username: username,
+      },
+    });
+
+    return res.status(200).json({
+      code: 'SUCCESS',
+      messasge: 'Successfully edit profile',
+      data: editData,
+    });
+  } catch (error) {
+    console.log('error edit profile = ', error);
     return res.status(500).json({
       code: 'INTERNAL_SERVER_ERROR',
       messasge: 'Something went wrong',
